@@ -1653,6 +1653,7 @@ async fn record_initial_history_forked_hydrates_previous_turn_settings() {
         network: None,
         file_system_sandbox_policy: None,
         model: previous_model.to_string(),
+        service_tier: None,
         personality: turn_context.personality,
         collaboration_mode: Some(turn_context.collaboration_mode.clone()),
         realtime_active: Some(turn_context.realtime_active),
@@ -5559,6 +5560,16 @@ async fn turn_context_item_stores_split_file_system_sandbox_policy_when_differen
         item.permission_profile,
         Some(turn_context.permission_profile())
     );
+}
+
+#[tokio::test]
+async fn turn_context_item_stores_service_tier_when_configured() {
+    let (_session, mut turn_context) = make_session_and_context().await;
+    Arc::make_mut(&mut turn_context.config).service_tier = Some(ServiceTier::Fast);
+
+    let item = turn_context.to_turn_context_item();
+
+    assert_eq!(item.service_tier, Some(ServiceTier::Fast));
 }
 
 #[tokio::test]
