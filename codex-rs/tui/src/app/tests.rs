@@ -2692,6 +2692,7 @@ async fn inactive_thread_started_notification_initializes_replay_session() -> Re
         network: None,
         file_system_sandbox_policy: None,
         model: "gpt-agent".to_string(),
+        service_tier: None,
         personality: None,
         collaboration_mode: None,
         realtime_active: Some(false),

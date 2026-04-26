@@ -2903,6 +2903,8 @@ pub struct TurnContextItem {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub file_system_sandbox_policy: Option<FileSystemSandboxPolicy>,
     pub model: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub service_tier: Option<ServiceTier>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub personality: Option<Personality>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -5022,6 +5024,39 @@ mod tests {
     }
 
     #[test]
+    fn turn_context_item_serializes_service_tier_when_present() -> Result<()> {
+        for (service_tier, expected) in [(ServiceTier::Fast, "fast"), (ServiceTier::Flex, "flex")] {
+            let item = TurnContextItem {
+                turn_id: None,
+                trace_id: None,
+                cwd: test_path_buf("/tmp"),
+                current_date: None,
+                timezone: None,
+                approval_policy: AskForApproval::Never,
+                sandbox_policy: SandboxPolicy::DangerFullAccess,
+                permission_profile: None,
+                network: None,
+                file_system_sandbox_policy: None,
+                model: "gpt-5.5".to_string(),
+                service_tier: Some(service_tier),
+                personality: None,
+                collaboration_mode: None,
+                realtime_active: None,
+                effort: None,
+                summary: ReasoningSummaryConfig::Auto,
+                user_instructions: None,
+                developer_instructions: None,
+                final_output_json_schema: None,
+                truncation_policy: None,
+            };
+
+            let value = serde_json::to_value(item)?;
+            assert_eq!(value["service_tier"], json!(expected));
+        }
+        Ok(())
+    }
+
+    #[test]
     fn turn_context_item_serializes_network_when_present() -> Result<()> {
         let item = TurnContextItem {
             turn_id: None,
@@ -5045,6 +5080,7 @@ mod tests {
                 },
             ])),
             model: "gpt-5".to_string(),
+            service_tier: None,
             personality: None,
             collaboration_mode: None,
             realtime_active: None,
